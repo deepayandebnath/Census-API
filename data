@@ -1,0 +1,35 @@
+import requests as r
+import json
+import pandas as pd
+import csv
+for i in range(2008, 2020):
+    year=str(i)
+    #var='NAME,B01001_001E,B01001A_001E,B01001B_001E,B01002_001E'
+    var='NAME,B01001_001E,B01001A_001E,B01001B_001E,B01002_001E,B19082_006E,B19013_001E,B19013A_001E,B19013B_001E'
+    #,B19082_006E,B05009_001E,B09021_022E,B06012_002E'
+    url='https://api.census.gov/data/'+year+'/acs/acs1?get='+var+'&for=place:15670&in=state:29&key=API_Key'
+    response=r.get(url)
+    if (response.status_code)==200:
+        col_names=["Location","TotPop","WhitePop","AfricanPop","MedianAge","GiniIndex","MedianHouseholdOverallIncome","MedianHouseholdWhiteIncome","MedianHouseholdBlackIncome","City","State"]
+        #"Age:0-17","Age: over 65","PovertyAll",]
+        df=pd.DataFrame(columns=col_names, data=response.json()[1:])
+        df['Year']=year
+        print(df)
+        df.to_csv(r'/Users/deepayandebnath/Documents/Census/'+year+'_C.csv', index = False)
+    else: 
+        print(response.status_code)
+
+
+# writing into .csv 
+import pandas as pd
+import glob
+import csv
+path = r'/Users/XXX/Documents/Census' # path
+all_files = glob.glob(path + "/*.csv")
+li = []
+for filename in all_files:
+    df = pd.read_csv(filename, index_col=None, header=0)
+    li.append(df)
+frame = pd.concat(li, axis=0, ignore_index=True)
+frame.to_csv(r'/Users/XXX/Documents/Census/All_POP_census.csv', index = False)
+#print(frame)
